@@ -64,7 +64,47 @@ const Complaint = mongoose.model(
     'Complaint',
     complaintSchema
 );
+const Village = require("./models/Village");
+/* LOGIN PAGE */
 
+app.get("/login",(req,res)=>{
+
+res.render("login");
+
+});
+/* LOGIN AUTHENTICATION */
+
+app.post("/login", (req, res) => {
+
+    const { username, password, role } = req.body;
+
+    if (
+        username === "admin" &&
+        password === "admin123" &&
+        role === "Admin"
+    ) {
+        return res.redirect("/dashboard");
+    }
+
+    if (
+        username === "officer" &&
+        password === "officer123" &&
+        role === "Panchayat Officer"
+    ) {
+        return res.redirect("/dashboard");
+    }
+
+    if (
+        username === "staff" &&
+        password === "staff123" &&
+        role === "Staff"
+    ) {
+        return res.redirect("/dashboard");
+    }
+
+    res.send("Invalid Username or Password");
+
+});
 /* HOME PAGE */
 
 app.get('/', async (req, res) => {
@@ -124,6 +164,7 @@ app.post('/', async (req, res) => {
 
 });
 
+
 /* DELETE */
 
 app.get('/delete/:id', async (req,res) => {
@@ -164,4 +205,24 @@ app.listen(PORT, () => {
         `Server running on port ${PORT}`
     );
 
+});
+/* DASHBOARD */
+
+app.get("/dashboard", async (req, res) => {
+
+    const complaints = await Complaint.find().lean();
+
+    const village = await Village.findOne().lean();
+
+    res.render("dashboard", {
+
+        totalComplaints: complaints.length,
+
+        village: village
+
+    });
+
+});
+app.get("/village", (req, res) => {
+    res.render("village");
 });
